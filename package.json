@@ -9,15 +9,21 @@
         "build:dir": "npm run build --dir -c.compression=store -c.mac.identity=null"
     },
     "dependencies": {
+        "electron-store": "^5.0.0",
         "firebase": "^6.2.0",
+        "inversify": "^5.0.1",
+        "office-ui-fabric-react": "^7.31.3",
         "react": "^16.8.6",
         "react-dom": "^16.8.6",
-        "source-map-support": "^0.5.12"
+        "reflect-metadata": "^0.1.13",
+        "source-map-support": "^0.5.12",
+        "styled-components": "^4.3.2"
     },
     "devDependencies": {
         "@babel/preset-react": "^7.0.0",
         "@types/react": "^16.8.21",
         "@types/react-dom": "^16.8.4",
+        "@types/styled-components": "^4.1.19",
         "electron": "5.0.4",
         "electron-builder": "^20.44.2",
         "electron-webpack": "^2.6.2",

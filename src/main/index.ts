@@ -1,61 +1,46 @@
-import { app, BrowserWindow } from 'electron'
-import * as path from 'path'
-import { format as formatUrl } from 'url'
-import MainWindow from './MainWindow';
+import { app, BrowserWindow, ipcMain } from 'electron'
+import Container from "./utilities/container"
+import { TYPES } from "./utilities/types"
+import { IAuthentication, IUserInterface } from './core'
+import { IpcEvent } from './core/user-interface'
 
-const isDevelopment = process.env.NODE_ENV !== 'production'
+const authentication = Container.get<IAuthentication>(TYPES.Authentication)
+const userInterface = Container.get<IUserInterface>(TYPES.UserInterface)
 
-// global reference to mainWindow (necessary to prevent window from being garbage collected)
-let mainWindow:MainWindow | null;
+let mainWindow: BrowserWindow | null
 
-function createMainWindow() {
-    const window = new MainWindow({ webPreferences: { nodeIntegration: true } })
-
-    if (isDevelopment) {
-        window.webContents.openDevTools()
-    }
-
-    if (isDevelopment) {
-        window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
-    }
-    else {
-        window.loadURL(formatUrl({
-            pathname: path.join(__dirname, 'index.html'),
-            protocol: 'file',
-            slashes: true
-        }))
-    }
-
-    window.on('closed', () => {
-        mainWindow = null
-    })
-
-    window.webContents.on('devtools-opened', () => {
-        window.focus()
-        setImmediate(() => {
-            window.focus()
-        })
-    })
-
-    return window
-}
-
-// quit application when all windows are closed
-app.on('window-all-closed', () => {
-    // on macOS it is common for applications to stay open until the user explicitly quits
-    if (process.platform !== 'darwin') {
+ipcMain.on('ERROR', (event: IpcEvent, args: { message: string }) => {
+    console.log('error', args)
+    if(BrowserWindow.getAllWindows().length <= 1) {
         app.quit()
+    } else {
+        BrowserWindow.fromWebContents(event.sender.WebContents).close()
     }
 })
 
-app.on('activate', () => {
+const loadMain = () => {
+    const window = userInterface.createWindow({ width: 1100, height: 600 })
+    window.configure({ route: 'Home' }, () => window.once('close', () => app.quit()))
+    mainWindow = window
+    ipcMain.once('LOGOUT', async (event: IpcEvent) => {
+        mainWindow = null
+        window.close()
+        await authentication.logout()
+        await authentication.show()
+        loadMain()
+    })
+}
+
+app.on('activate', async () => {
     // on macOS it is common to re-create a window even after all windows have been closed
     if (mainWindow === null) {
-        mainWindow = createMainWindow()
+        await authentication.show()
+        loadMain()
     }
 })
 
 // create main BrowserWindow when electron is ready
-app.on('ready', () => {
-    mainWindow = createMainWindow()
+app.on('ready', async () => {
+    await authentication.show()
+    loadMain()
 })
