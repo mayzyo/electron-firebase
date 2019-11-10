@@ -2,6 +2,14 @@
     "extends": "./node_modules/electron-webpack/tsconfig-base.json",
     "compilerOptions": {
         "jsx": "react",
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "baseUrl": "src",
+        "paths": {
+            "@utils/*": ["main/utils/*"],
+            "@services": ["main/services"],
+            "@models/*": ["common/models/*"],
+            "@components": ["renderer/components"],
+            "@hooks": ["renderer/hooks"],
+        }
     }
 }

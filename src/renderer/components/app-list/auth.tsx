@@ -4,7 +4,7 @@ import { ipcRenderer } from 'electron'
 import { Text } from 'office-ui-fabric-react/lib/Text'
 import { TextField } from 'office-ui-fabric-react/lib/TextField'
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button'
-import AuthForm from '../../../common/auth-form'
+import AuthForm from '@models/auth-form'
 
 const Authentication = () => {
 
@@ -67,8 +67,7 @@ const Container = styled.div(props => ({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    height: window.innerHeight,
-    width: window.innerWidth,
+    flex: 1
 }))
 const InputView = styled.div(props => ({
     marginTop: 10,

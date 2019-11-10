@@ -1,9 +1,8 @@
 import { ipcRenderer } from "electron"
 import ReactDOM from 'react-dom'
 import { initializeIcons } from '@uifabric/icons'
-import Authentication from "./core/authentication"
-import RendererOption from "../common/renderer-option"
-import Home from "./core/home"
+import { AppList } from '@components'
+import RendererOption from "@models/renderer-option"
 
 document.body.style.margin = '0'
 initializeIcons()
@@ -11,18 +10,19 @@ initializeIcons()
 let initial: RendererOption = ipcRenderer.sendSync('READY')
 
 switch (initial.route) {
-    case 'Auth':
-        ReactDOM.render(Authentication(), document.getElementById('app'))
-        break
-    case 'Home':
-        ReactDOM.render(Home(), document.getElementById('app'))
+    case 'AppList':
+        ReactDOM.render(AppList(), document.getElementById('app'))
         break
     default:
         ipcRenderer.send('ERROR', { message: 'No route was found' })
 }
 
 if (module.hot) {
-    module.hot.accept('./core/home', function () {
-        ReactDOM.render(Home(), document.getElementById('app'))
-    })
+    switch (initial.route) {
+        case 'AppList':
+            module.hot.accept('@components', () => {
+                ReactDOM.render(AppList(), document.getElementById('app'))
+            })
+            break
+    }
 }

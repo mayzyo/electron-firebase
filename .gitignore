@@ -1,4 +1,5 @@
-node_modules
-
-# out dir
-dist
+.DS_Store
+dist/
+node_modules/
+thumbs.db
+.idea/
