@@ -50,7 +50,11 @@ export class UserInterface implements IUserInterface {
     }
 
     open(href: string) {
-        shell.openExternal(href)
+        if(href.startsWith('https') || href.startsWith('http')) {
+            shell.openExternal(href)
+        } else {
+
+        }
     }
 
     connect(actionMap: Map<string, Function>) {

@@ -7,6 +7,7 @@ import ElectronStore from 'electron-store'
 import { TYPES } from "@utils/types"
 import AuthForm from "@models/auth-form"
 import IUserInterface from "./user-interface"
+import { firebaseKey } from "../keystore"
 
 const SALT = 'salt'
 
@@ -30,15 +31,7 @@ export class Authentication implements IAuthentication {
 
     constructor() {
         // Initialize Firebase
-        this.firebaseApp = Firebase.initializeApp({
-            apiKey: "AIzaSyBVlpmxj7PGBO5THWvBagfq612KpismVvo",
-            authDomain: "hello-firebase-1d6fc.firebaseapp.com",
-            databaseURL: "https://hello-firebase-1d6fc.firebaseio.com",
-            projectId: "hello-firebase-1d6fc",
-            storageBucket: "hello-firebase-1d6fc.appspot.com",
-            messagingSenderId: "760507585405",
-            appId: "1:760507585405:web:521de7303a07a749"
-        })
+        this.firebaseApp = Firebase.initializeApp(firebaseKey)
     }
 
     showWindow(onAuth?: Promise<void>, onCancel?: Promise<void>) {

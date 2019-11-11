@@ -1,5 +1,11 @@
 .DS_Store
-dist/
-node_modules/
 thumbs.db
 .idea/
+
+node_modules
+
+# Key Storage
+keystore.ts
+
+# Output Folder
+dist
