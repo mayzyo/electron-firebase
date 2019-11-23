@@ -1,24 +1,45 @@
 import React from 'react'
 import { Text } from 'office-ui-fabric-react/lib/Text'
+import styled from 'styled-components'
 
 export default (props: MenuContainer) => {
     return (
-        <div className="container-fluid" style={{ borderRight: '.5px solid rgba(0,0,0,0.1)', paddingTop: 5 }}>
-            <div className="row" style={{ height: props.height }}>
+        <Container>
+            <MenuView height={props.height}>
                 { props.renderItems.map((el, i) => 
-                    <div className="col-auto" key={i}>
-                        {el}
-                    </div>
+                    <MenuItemView key={i}>{el}</MenuItemView>
                 )}
-            </div>
-            <div className="row justify-content-center">
-                <div className="col-auto" style={{ fontSize: 12 }}>
-                    <Text variant="small">{props.label}</Text>
-                </div>
-            </div>
-        </div>
+            </MenuView>
+            <LabelView>
+                <Text variant="small">{props.label}</Text>
+            </LabelView>
+        </Container>
     )
 }
+
+// STYLE PROPERTIES
+const Container = styled.div(props => ({
+    display: 'flex', 
+    flexDirection: 'column', 
+    borderRight: '.5px solid rgba(0,0,0,0.1)', 
+    padding: '5px 10px 0 10px',
+}))
+const MenuView = styled.div<{ height: number }>(props => ({
+    display: 'flex', 
+    flexDirection: 'row', 
+    height: props.height,
+    paddingBottom: 5
+}))
+const MenuItemView = styled.div(props => ({
+    display: 'flex',
+    flexDirection: 'column'
+}))
+const LabelView = styled.div(props => ({
+    display: 'flex', 
+    flexDirection: 'row', 
+    justifyContent: 'center',
+    fontSize: 12
+}))
 
 export interface MenuContainer {
     label: string

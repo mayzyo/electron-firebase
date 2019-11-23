@@ -1,11 +1,12 @@
 import React from 'react'
 import { CommandBarButton } from 'office-ui-fabric-react/lib/Button'
 import { IContextualMenuProps } from 'office-ui-fabric-react/lib/ContextualMenu'
+import styled from 'styled-components'
 
 export default (props: MenuItem) => {
     return (
         <>
-            <div className="row" style={{ height: props.menuProps ? '50%' : '100%' }}>
+            <ButtonView hasContextual={props.menuProps != undefined}>
                 <CommandBarButton
                     styles={{
                         flexContainer: { display: 'block' },
@@ -16,9 +17,10 @@ export default (props: MenuItem) => {
                     text={!props.menuProps ? props.label : ''}
                     onClick={e => props.action && props.action()}
                 />
-            </div>
+            </ButtonView>
+            
             { props.menuProps &&
-                <div className="row" style={{ height: '50%' }}>
+                <ContextualView>
                     <CommandBarButton
                         text={props.label}
                         styles={{
@@ -27,11 +29,23 @@ export default (props: MenuItem) => {
                         }}
                         menuProps={props.menuProps}
                     />
-                </div>
+                </ContextualView>
             }
         </>
     )
 }
+
+// STYLE PROPERTIES
+const ButtonView = styled.div<{ hasContextual?: boolean }>(props => ({
+    display: 'flex', 
+    flexDirection: 'row', 
+    height: props.hasContextual ? '50%' : '100%'
+}))
+const ContextualView = styled.div(props => ({
+    display: 'flex', 
+    flexDirection: 'row', 
+    height: '50%' 
+}))
 
 export interface MenuItem {
     label: string

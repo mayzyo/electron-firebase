@@ -1,6 +1,7 @@
 import React from 'react'
 import { MenuItem } from './menu-item'
 import { CommandBarButton } from 'office-ui-fabric-react/lib/Button'
+import styled from 'styled-components'
 
 const group = (items: MenuItem[], size: number) => {
     // size = Math.floor(items.length / size) + 1
@@ -19,14 +20,11 @@ const group = (items: MenuItem[], size: number) => {
 export default (props: MenuList) => {
     
     return (
-        <div className="row" style={{ height: '100%' }}>
+        <Container>
             { group(props.items, 3).map((g, i) =>
-                <div key={i} className={`col-auto ${ (i == 0 && g.length == 3) ? '' : 'align-self-center' }`}>
+                <ListGroupView key={i}>
                     {g.map((el, t) =>
-                        <div key={t} className="row" style={{ 
-                            height: '33.33%',
-                            padding: (i == 0 && g.length == 3) ? '0' : '10% 0'
-                        }}>
+                        <ListItemView>
                             <CommandBarButton
                             iconProps={{ iconName: el.icon }}
                             text={el.label}
@@ -34,13 +32,30 @@ export default (props: MenuList) => {
                             onClick={() => el.action && el.action()}
                             menuProps={el.menuProps && el.menuProps}
                             />
-                        </div>
+                        </ListItemView>
                     )}
-                </div>
+                </ListGroupView>
             )}
-        </div>
+        </Container>
     )
 }
+
+// STYLE PROPERTIES
+const Container = styled.div(props => ({
+    display:'flex',
+    flexGrow: 1
+}))
+const ListGroupView = styled.div(props => ({
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1
+}))
+const ListItemView = styled.div(props => ({
+    display: 'flex', 
+    flexDirection: 'row',
+    height: '33.33%',
+}))
+
 
 export interface MenuList {
     items: MenuItem[]

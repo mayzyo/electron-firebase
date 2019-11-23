@@ -11,20 +11,20 @@ import Landing from './landing'
 import List from './list'
 import Auth from './auth'
 
-const Home = () => {
+const AppList = () => {
 
     const { action } = useService()
     const [projects] = useState<Project[]>(action('projectManifests'))
     const [showLogin, setShowLogin] = useState(false)
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: window.innerHeight }}>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, height: window.innerHeight }}>
             <Pivot headersOnly={showLogin} onLinkClick={() => setShowLogin(false)}>
                 <PivotItem headerText="Tools">
-                    <List projects={projects} handleHref={(url: string) => action('open', url)} />
+                    <List projects={projects} handleHref={(url: string) => action('navigate', url)} />
                 </PivotItem>
                 <PivotItem headerText="Companions">
-                    <List projects={[]} handleHref={(url: string) => action('open', url)} />
+                    <List projects={[]} handleHref={(url: string) => action('navigate', url)} />
                 </PivotItem>
                 <PivotItem headerText="Games">
                     <Landing />
@@ -59,4 +59,4 @@ const UserView = styled.div(props => ({
     display: 'flex'
 }))
 
-export default () => <Home />
+export default () => <AppList />

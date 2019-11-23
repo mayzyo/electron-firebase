@@ -7,11 +7,9 @@ import RendererOption from '@models/renderer-option'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 export default interface IUserInterface {
-    createWindow(options?: BrowserWindowConstructorOptions): BrowserWindowExtension
+    createWindow(configs: BrowserWindowConfig, options?: BrowserWindowConstructorOptions): BrowserWindow
     closeAll(): void
-    open(href: string): void
-    connect(actionMap: Map<string, Function>): (event: any, type: string, ...args: any[]) => Promise<any>
-    remove(listener: (event: any, type: string, ...args: any[]) => Promise<any>): void
+    connect(window: BrowserWindow, actionMap: Map<string, Function>): void
 }
 
 @injectable()
@@ -22,13 +20,13 @@ export class UserInterface implements IUserInterface {
         Menu.setApplicationMenu(null)
     }
 
-    createWindow(options?: BrowserWindowConstructorOptions) {
-        let window = new BrowserWindowExtension({ 
+    createWindow(configs: BrowserWindowConfig, options?: BrowserWindowConstructorOptions) {
+        let window = new BrowserWindow({ 
             webPreferences: { nodeIntegration: true, enableRemoteModule: false },
             ...options
         })
 
-        window.setTitle('Electron Firebase')
+        this.configureWindow(window, configs)
 
         if (isDevelopment) {
             window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
@@ -49,15 +47,7 @@ export class UserInterface implements IUserInterface {
         BrowserWindow.getAllWindows().forEach(el => el.close())
     }
 
-    open(href: string) {
-        if(href.startsWith('https') || href.startsWith('http')) {
-            shell.openExternal(href)
-        } else {
-
-        }
-    }
-
-    connect(actionMap: Map<string, Function>) {
+    connect(window: BrowserWindow, actionMap: Map<string, Function>) {
 
         const listener = async (event: any, type: string, ...args:any[]) => {
             const action = actionMap.get(type)    
@@ -65,23 +55,25 @@ export class UserInterface implements IUserInterface {
         }
 
         ipcMain.on('SERVICE', listener)
-        return listener
+        window.once('close', () => ipcMain.removeListener('SERVICE', listener))
     }
 
-    remove(listener: (event: any, type: string, ...args: any[]) => Promise<any>) {
-        ipcMain.removeListener('SERVICE', listener)
+    private configureWindow(window: BrowserWindow, configs: BrowserWindowConfig) {
+        ipcMain.once('READY', (event) => {
+            configs.onReady && configs.onReady()
+            event.returnValue = configs.options
+        })
+
+        if(configs.actionMap) {
+            this.connect(window, configs.actionMap)
+        }
+
+        window.setTitle('Electron Firebase')
     }
 }
 
-class BrowserWindowExtension extends BrowserWindow {
-
-    constructor(options?: BrowserWindowConstructorOptions | undefined) { super(options)
-    }
-
-    configure(options: RendererOption, onReady?: Function) {
-        ipcMain.once('READY', (event) => {
-            onReady && onReady()
-            event.returnValue = options
-        })
-    }
+export interface BrowserWindowConfig {
+    options: RendererOption, 
+    onReady?: Function,
+    actionMap?: Map<string, Function>
 }

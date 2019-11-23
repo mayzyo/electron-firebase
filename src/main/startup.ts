@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, shell } from 'electron'
 import fs from 'fs'
 import path from 'path'
 import Container from "@utils/container"
@@ -9,7 +9,7 @@ import Project from '@models/project'
 // Dependency Injection Setup
 const authentication = Container.get<IAuthentication>(TYPES.Authentication)
 const userInterface = Container.get<IUserInterface>(TYPES.UserInterface)
-
+// let browserWindow: BrowserWindow
 const projectManifests = () => {
     const uri = path.join(__static, 'files', 'project-manifests.json')
     const projects: Project[] = JSON.parse(fs.readFileSync(uri, 'utf8'))
@@ -24,22 +24,39 @@ const projectManifests = () => {
     return projects
 }
 
+const navigate = (href: string) => {
+    if(href.startsWith('https') || href.startsWith('http')) {
+        shell.openExternal(href)
+    } else {
+        BrowserWindow.getAllWindows()
+        .filter(el => el != mainWindow)
+        .forEach(el => el.close())
+
+        userInterface.createWindow(
+            { options: { route: href } }, 
+            { width: 1280, height: 720 }
+        )
+    }
+}
+
 export let mainWindow: BrowserWindow | null
 
 export const startup = () => {
-    const window = userInterface.createWindow({ width: 420, height: 680, resizable: false })
-    window.configure(
-        { route: 'AppList' }, 
-        () => window.once(
-            'close', 
-            () => app.quit()
-        )
+    const window = userInterface.createWindow(
+        {
+            options: { route: 'AppList' },
+            onReady: () => window.once(
+                'close', 
+                () => app.quit()
+            )
+        },
+        { width: 420, height: 680, resizable: false }
     )
 
-    userInterface.connect(new Map([
+    userInterface.connect(window, new Map([
         ['projectManifests', projectManifests],
-        ['open', userInterface.open]
+        ['navigate', navigate]
     ]))
-    // console.log('FORCE REFRESH')
+    console.log('FORCE REFRESH')
     mainWindow = window
 }

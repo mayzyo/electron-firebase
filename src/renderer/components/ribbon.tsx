@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from 'react'
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot'
 import { IconButton } from 'office-ui-fabric-react/lib/Button'
+import styled from 'styled-components'
 
 export default (props: Ribbon) => {
     const [expanded, setExpanded] = useState(true)
     const [pinned, setPinned] = useState(true)
 
-    const handleButton = () => {
+    const handleMouseClick = (e: MouseEvent) => {
+        if(e.screenY > 335 && expanded && !pinned) {
+            setExpanded(false)
+        }
+        // console.log(e.screenY)
+    }
+
+    useEffect(() => {
+        document.addEventListener('click', handleMouseClick)
+        return () => document.removeEventListener('click', handleMouseClick)
+    }, [expanded, pinned])
+
+    const handleToggle = () => {
         if (pinned) {
             setExpanded(false)
             setPinned(false)
@@ -14,12 +27,6 @@ export default (props: Ribbon) => {
             setPinned(true)
         }
     }
-
-    useEffect(() => {
-        if (props.mouseY != undefined && !pinned && expanded && props.mouseY > 138) {
-            setExpanded(false)
-        }
-    }, [props.mouseY])
 
     return (
         <Pivot
@@ -34,31 +41,39 @@ export default (props: Ribbon) => {
         >
             {props.menus.map(el =>
                 <PivotItem headerText={el.title} key={el.title}>
-                    <div className="container-fluid">
-                        <div className="row justify-content-between">
+                    <ItemContainer>
 
-                            <div className="col-auto pl-4">
-                                {el.renderItem}
-                            </div>
+                        {el.renderItem}
 
-                            <div className="col-auto align-self-end">
-                                <IconButton
-                                    onClick={e => handleButton()}
-                                    iconProps={{ iconName: pinned ? 'ChevronUp' : 'Pin' }}
-                                    title={pinned ? 'Hide Menu' : 'Pin Menu'}
-                                    ariaLabel={pinned ? 'Hide Top Menu' : 'Pin Top Menu'}
-                                />
-                            </div>
+                        <IconView>
+                            <IconButton
+                                onClick={e => handleToggle()}
+                                iconProps={{ iconName: pinned ? 'ChevronUp' : 'Pin' }}
+                                title={pinned ? 'Hide Menu' : 'Pin Menu'}
+                                ariaLabel={pinned ? 'Hide Top Menu' : 'Pin Top Menu'}
+                            />
+                        </IconView>
 
-                        </div>
-                    </div>
+                    </ItemContainer>
                 </PivotItem>
             )}
         </Pivot>
     )
 }
 
+// STYLE PROPERTIES
+const ItemContainer = styled.div(props => ({
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%'
+}))
+const IconView = styled.div(props => ({
+    flexGrow: 1,
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end'
+}))
+
 export interface Ribbon {
-    mouseY?: number,
     menus: { title: string, renderItem: JSX.Element }[]
 }

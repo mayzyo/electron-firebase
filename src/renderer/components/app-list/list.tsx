@@ -13,7 +13,12 @@ export default (props: List) => {
     return (
         <Container>
             { props.projects.map(el =>(
-                <DocumentCard key={el.name} type={DocumentCardType.compact} style={{ margin: 10 }}>
+                <DocumentCard 
+                key={el.name} 
+                type={DocumentCardType.compact} 
+                style={{ margin: 10 }} 
+                onClick={() => props.handleHref(el.uri)}
+                >
 
                     <PreviewView dangerouslySetInnerHTML={el.icon ? { __html: el.icon } : undefined} /> 
 
@@ -23,7 +28,7 @@ export default (props: List) => {
                         actions={[
                             {
                             iconProps: { iconName: 'Share' },
-                            onClick: () => props.handleHref(el.uri),
+                            onClick: () => {},
                             ariaLabel: 'share action'
                             },
                             {
